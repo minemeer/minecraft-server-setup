@@ -1,0 +1,15 @@
+[Unit]
+Description=Minecraft {{NAME}} Server
+After=network.target
+
+[Service]
+User=mc
+Group=mc
+WorkingDirectory=/opt/minecraft/{{NAME}}
+ExecStart=/usr/bin/screen -dmS {{NAME}} bash -c '/opt/minecraft/{{NAME}}/start.sh'
+ExecStop=/usr/bin/screen -S {{NAME}} -p 0 -X stuff "stop^M"
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

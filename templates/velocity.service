@@ -1,0 +1,15 @@
+[Unit]
+Description=Minecraft Velocity Proxy
+After=network.target
+
+[Service]
+User=mc
+Group=mc
+WorkingDirectory=/opt/minecraft/velocity
+ExecStart=/usr/bin/screen -dmS velocity bash -c '/opt/minecraft/velocity/start.sh'
+ExecStop=/usr/bin/screen -S velocity -p 0 -X stuff "shutdown^M"
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
