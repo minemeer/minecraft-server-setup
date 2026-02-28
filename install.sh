@@ -43,9 +43,9 @@ setup_user() {
 
 # Abhängigkeiten installieren
 install_deps() {
-    echo -e "${GREEN}Installiere Abhängigkeiten (openjdk-17, screen, wget)...${NC}"
+    echo -e "${GREEN}Installiere Abhängigkeiten (openjdk-21, screen, wget)...${NC}"
     apt update
-    apt install -y openjdk-17-jre-headless screen wget curl
+    apt install -y openjdk-21-jre-headless screen wget curl
 }
 
 # Basisverzeichnis erstellen und Besitzer setzen
