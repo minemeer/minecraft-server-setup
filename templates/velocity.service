@@ -6,9 +6,8 @@ After=network.target
 User=mc
 Group=mc
 WorkingDirectory=/opt/minecraft/velocity
-ExecStart=/usr/bin/screen -dmS velocity /opt/minecraft/velocity/start.sh
+ExecStart=/usr/bin/screen -D -m -S velocity /opt/minecraft/velocity/start.sh
 ExecStop=/usr/bin/screen -S velocity -p 0 -X stuff "shutdown^M"
-ExecStopPost=/usr/bin/screen -S velocity -X quit
 Restart=always
 RestartSec=10
 
