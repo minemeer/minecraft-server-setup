@@ -1,5 +1,5 @@
 #!/bin/bash
-# Minecraft Server Setup für Ubuntu (mit systemd + screen)
+# Minecraft Server Setup for Ubuntu (with systemd + screen)
 # Repository: https://github.com/minemeer/minecraft-server-setup
 
 set -e
@@ -8,38 +8,38 @@ REPO_BASE="https://raw.githubusercontent.com/minemeer/minecraft-server-setup/mai
 MC_USER="mc"
 MC_BASE="/opt/minecraft"
 
-# Farben
+# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
 show_help() {
-    echo "Verwendung: $0 [OPTION]"
-    echo "Optionen:"
-    echo "  --add-server NAME   Neuen Paper-Server mit Namen NAME anlegen"
-    echo "  --help              Diese Hilfe anzeigen"
+    echo "Usage: $0 [OPTION]"
+    echo "Options:"
+    echo "  --add-server NAME   Create a new Paper server with the given NAME"
+    echo "  --help              Show this help"
     exit 0
 }
 
 check_root() {
     if [[ $EUID -ne 0 ]]; then
-        echo -e "${RED}Bitte als root ausführen (sudo).${NC}"
+        echo -e "${RED}Please run as root (sudo).${NC}"
         exit 1
     fi
 }
 
 setup_user() {
     if ! id -u "$MC_USER" &>/dev/null; then
-        echo -e "${GREEN}Benutzer $MC_USER wird angelegt...${NC}"
+        echo -e "${GREEN}Creating user $MC_USER...${NC}"
         useradd --system --user-group --home-dir "$MC_BASE" --create-home "$MC_USER"
     else
-        echo -e "${YELLOW}Benutzer $MC_USER existiert bereits.${NC}"
+        echo -e "${YELLOW}User $MC_USER already exists.${NC}"
     fi
 }
 
 install_deps() {
-    echo -e "${GREEN}Installiere Abhängigkeiten...${NC}"
+    echo -e "${GREEN}Installing dependencies...${NC}"
     apt update
     apt install -y openjdk-21-jre-headless screen wget curl
 }
@@ -56,7 +56,7 @@ download_and_replace() {
     local tmp_file="/tmp/${template}.tmp"
 
     wget -q "${REPO_BASE}/${template}" -O "$tmp_file" || {
-        echo -e "${RED}Fehler beim Herunterladen von ${template}${NC}"
+        echo -e "${RED}Error downloading ${template}${NC}"
         return 1
     }
 
@@ -70,7 +70,7 @@ download_and_replace() {
 
     mkdir -p "$(dirname "$output")"
     mv "$tmp_file" "$output"
-    echo -e "${GREEN}✓ ${output} erstellt${NC}"
+    echo -e "${GREEN}✓ ${output} created${NC}"
 }
 
 ask_number() {
@@ -84,18 +84,18 @@ ask_number() {
             echo "$var"
             break
         else
-            echo -e "${RED}Bitte eine gültige Zahl eingeben.${NC}"
+            echo -e "${RED}Please enter a valid number.${NC}"
         fi
     done
 }
 
-# Funktion zum Prüfen, ob ein Dienst läuft
+# Function to check if a service is running
 check_service() {
     local service="minecraft-$1.service"
     if systemctl is-active --quiet "$service"; then
-        echo -e "${GREEN}✓ $service läuft${NC}"
+        echo -e "${GREEN}✓ $service is running${NC}"
     else
-        echo -e "${RED}✗ $service läuft NICHT! Bitte Logs prüfen: journalctl -u $service${NC}"
+        echo -e "${RED}✗ $service is NOT running! Check logs: journalctl -u $service${NC}"
     fi
 }
 
@@ -111,11 +111,11 @@ install_server() {
     local service_file="/etc/systemd/system/minecraft-${name}.service"
 
     if [[ -d "$server_dir" && -f "$start_script" ]]; then
-        echo -e "${YELLOW}Server $name existiert bereits.${NC}"
-        read -p "Soll die Konfiguration überschrieben werden? (j/N) " -n 1 -r
+        echo -e "${YELLOW}Server $name already exists.${NC}"
+        read -p "Overwrite configuration? (y/N) " -n 1 -r
         echo
-        if [[ ! $REPLY =~ ^[Jj]$ ]]; then
-            echo -e "${YELLOW}Überspringe $name.${NC}"
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo -e "${YELLOW}Skipping $name.${NC}"
             return
         fi
     fi
@@ -142,15 +142,15 @@ install_server() {
     systemctl enable "minecraft-${name}.service"
     systemctl restart "minecraft-${name}.service"
 
-    # Kurz warten und prüfen
+    # Wait briefly and check
     sleep 3
     check_service "$name"
 
-    # Prüfen, ob screen-Session existiert
+    # Check if screen session exists
     if sudo -u "$MC_USER" screen -ls | grep -q "$name"; then
-        echo -e "${GREEN}✓ screen-Session '$name' läuft${NC}"
+        echo -e "${GREEN}✓ screen session '$name' is running${NC}"
     else
-        echo -e "${RED}✗ screen-Session '$name' wurde nicht gefunden! Bitte Logs prüfen.${NC}"
+        echo -e "${RED}✗ screen session '$name' not found! Check logs.${NC}"
     fi
 }
 
@@ -158,55 +158,55 @@ main_install() {
     echo -e "${GREEN}=== Minecraft Server Installation ===${NC}"
 
     echo -e "\n${YELLOW}--- Lobby Server (Paper) ---${NC}"
-    local lobby_port=$(ask_number "Port für Lobby" "25565")
-    local lobby_ram_min=$(ask_number "Min. RAM (MB) für Lobby" "1024")
-    local lobby_ram_max=$(ask_number "Max. RAM (MB) für Lobby" "2048")
+    local lobby_port=$(ask_number "Port for lobby" "25565")
+    local lobby_ram_min=$(ask_number "Min. RAM (MB) for lobby" "1024")
+    local lobby_ram_max=$(ask_number "Max. RAM (MB) for lobby" "2048")
     install_server "paper" "lobby" "$lobby_port" "$lobby_ram_min" "$lobby_ram_max"
 
     echo -e "\n${YELLOW}--- Velocity Proxy ---${NC}"
-    local velocity_port=$(ask_number "Port für Velocity" "25577")
-    local velocity_ram_min=$(ask_number "Min. RAM (MB) für Velocity" "512")
-    local velocity_ram_max=$(ask_number "Max. RAM (MB) für Velocity" "1024")
+    local velocity_port=$(ask_number "Port for Velocity" "25577")
+    local velocity_ram_min=$(ask_number "Min. RAM (MB) for Velocity" "512")
+    local velocity_ram_max=$(ask_number "Max. RAM (MB) for Velocity" "1024")
     install_server "velocity" "velocity" "$velocity_port" "$velocity_ram_min" "$velocity_ram_max"
 
     while true; do
         echo
-        read -p "Möchtest du einen weiteren Paper-Server hinzufügen? (j/N) " -n 1 -r
+        read -p "Do you want to add another Paper server? (y/N) " -n 1 -r
         echo
-        if [[ ! $REPLY =~ ^[Jj]$ ]]; then
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             break
         fi
-        read -p "Name des Servers (z.B. citybuild): " server_name
-        server_port=$(ask_number "Port für $server_name" "25566")
-        ram_min=$(ask_number "Min. RAM (MB) für $server_name" "1024")
-        ram_max=$(ask_number "Max. RAM (MB) für $server_name" "2048")
+        read -p "Server name (e.g., citybuild): " server_name
+        server_port=$(ask_number "Port for $server_name" "25566")
+        ram_min=$(ask_number "Min. RAM (MB) for $server_name" "1024")
+        ram_max=$(ask_number "Max. RAM (MB) for $server_name" "2048")
         install_server "paper" "$server_name" "$server_port" "$ram_min" "$ram_max"
     done
 
-    echo -e "${GREEN}=== Installation abgeschlossen! ===${NC}"
-    echo "Verfügbare screen-Sessions:"
+    echo -e "${GREEN}=== Installation complete! ===${NC}"
+    echo "Available screen sessions:"
     sudo -u "$MC_USER" screen -ls
     echo ""
-    echo "Zugriff auf die Konsole:"
+    echo "Access the console:"
     echo "  sudo -u mc screen -r lobby"
     echo "  sudo -u mc screen -r velocity"
-    echo "  (bei weiteren Servern entsprechend)"
+    echo "  (similarly for other servers)"
 }
 
 add_server() {
     local name="$1"
     if [[ -z "$name" ]]; then
-        echo -e "${RED}Bitte einen Servernamen angeben!${NC}"
+        echo -e "${RED}Please specify a server name!${NC}"
         show_help
     fi
-    echo -e "${GREEN}Neuen Paper-Server '$name' hinzufügen${NC}"
-    local port=$(ask_number "Port für $name" "25565")
-    local ram_min=$(ask_number "Min. RAM (MB) für $name" "1024")
-    local ram_max=$(ask_number "Max. RAM (MB) für $name" "2048")
+    echo -e "${GREEN}Adding new Paper server '$name'${NC}"
+    local port=$(ask_number "Port for $name" "25565")
+    local ram_min=$(ask_number "Min. RAM (MB) for $name" "1024")
+    local ram_max=$(ask_number "Max. RAM (MB) for $name" "2048")
     install_server "paper" "$name" "$port" "$ram_min" "$ram_max"
 }
 
-# Hauptprogramm
+# Main program
 check_root
 
 if [[ $# -gt 0 ]]; then
@@ -218,7 +218,7 @@ if [[ $# -gt 0 ]]; then
             show_help
             ;;
         *)
-            echo -e "${RED}Unbekannte Option: $1${NC}"
+            echo -e "${RED}Unknown option: $1${NC}"
             show_help
             ;;
     esac
