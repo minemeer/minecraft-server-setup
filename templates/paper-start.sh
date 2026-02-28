@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 cd /opt/minecraft/{{NAME}}
 exec java -Xms{{RAM_MIN}}M -Xmx{{RAM_MAX}}M -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 \
      -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch \

@@ -6,8 +6,9 @@ After=network.target
 User=mc
 Group=mc
 WorkingDirectory=/opt/minecraft/{{NAME}}
-ExecStart=/usr/bin/screen -dmS {{NAME}} bash -c '/opt/minecraft/{{NAME}}/start.sh'
+ExecStart=/usr/bin/screen -dmS {{NAME}} /opt/minecraft/{{NAME}}/start.sh
 ExecStop=/usr/bin/screen -S {{NAME}} -p 0 -X stuff "stop^M"
+ExecStopPost=/usr/bin/screen -S {{NAME}} -X quit
 Restart=always
 RestartSec=10
 
