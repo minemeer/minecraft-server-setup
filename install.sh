@@ -102,7 +102,6 @@ check_service() {
 install_server() {
     local type="$1"
     local name="$2"
-    local port="$3"
     local ram_min="$4"
     local ram_max="$5"
 
@@ -124,7 +123,7 @@ install_server() {
 
     if [[ "$type" == "paper" ]]; then
         download_and_replace "paper-start.sh" "$start_script" \
-            "NAME=$name,RAM_MIN=$ram_min,RAM_MAX=$ram_max,PORT=$port"
+            "NAME=$name,RAM_MIN=$ram_min,RAM_MAX=$ram_max"
     else
         download_and_replace "velocity-start.sh" "$start_script" \
             "NAME=$name,RAM_MIN=$ram_min,RAM_MAX=$ram_max"
@@ -158,16 +157,14 @@ main_install() {
     echo -e "${GREEN}=== Minecraft Server Installation ===${NC}"
 
     echo -e "\n${YELLOW}--- Lobby Server (Paper) ---${NC}"
-    local lobby_port=$(ask_number "Port for lobby" "25565")
     local lobby_ram_min=$(ask_number "Min. RAM (MB) for lobby" "1024")
     local lobby_ram_max=$(ask_number "Max. RAM (MB) for lobby" "2048")
-    install_server "paper" "lobby" "$lobby_port" "$lobby_ram_min" "$lobby_ram_max"
+    install_server "paper" "lobby" "1234" "$lobby_ram_min" "$lobby_ram_max"
 
     echo -e "\n${YELLOW}--- Velocity Proxy ---${NC}"
-    local velocity_port=$(ask_number "Port for Velocity" "25577")
     local velocity_ram_min=$(ask_number "Min. RAM (MB) for Velocity" "512")
     local velocity_ram_max=$(ask_number "Max. RAM (MB) for Velocity" "1024")
-    install_server "velocity" "velocity" "$velocity_port" "$velocity_ram_min" "$velocity_ram_max"
+    install_server "velocity" "velocity" "1234" "$velocity_ram_min" "$velocity_ram_max"
 
     while true; do
         echo
@@ -177,10 +174,9 @@ main_install() {
             break
         fi
         read -p "Server name (e.g., citybuild): " server_name
-        server_port=$(ask_number "Port for $server_name" "25566")
         ram_min=$(ask_number "Min. RAM (MB) for $server_name" "1024")
         ram_max=$(ask_number "Max. RAM (MB) for $server_name" "2048")
-        install_server "paper" "$server_name" "$server_port" "$ram_min" "$ram_max"
+        install_server "paper" "$server_name" "1234" "$ram_min" "$ram_max"
     done
 
     echo -e "${GREEN}=== Installation complete! ===${NC}"
@@ -200,10 +196,9 @@ add_server() {
         show_help
     fi
     echo -e "${GREEN}Adding new Paper server '$name'${NC}"
-    local port=$(ask_number "Port for $name" "25565")
     local ram_min=$(ask_number "Min. RAM (MB) for $name" "1024")
     local ram_max=$(ask_number "Max. RAM (MB) for $name" "2048")
-    install_server "paper" "$name" "$port" "$ram_min" "$ram_max"
+    install_server "paper" "$name" "1234" "$ram_min" "$ram_max"
 }
 
 # Main program
